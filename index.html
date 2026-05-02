@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusBoost — Study Smarter</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #1d9e75;
+      --green-light: #e1f5ee;
+      --blue: #185fa5;
+      --blue-light: #e6f1fb;
+      --red: #c0392b;
+      --red-light: #fcebeb;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1a202c;
+      --text-2: #4a5568;
+      --text-3: #a0aec0;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.07);
+      --font: 'DM Sans', sans-serif;
+      --mono: 'DM Mono', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0 0 3rem;
+    }
+
+    .app { width: 100%; max-width: 400px; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* HEADER */
+    .header {
+      padding: 1.4rem 1.5rem 1rem;
+      border-radius: 0 0 28px 28px;
+      text-align: center;
+      transition: background 0.5s;
+    }
+    .header.work   { background: linear-gradient(135deg, #1a7a4a, #1565a8); }
+    .header.short  { background: linear-gradient(135deg, #1565a8, #0e5e87); }
+    .header.long   { background: linear-gradient(135deg, #0e5e87, #095070); }
+    .header h1 { color: #fff; font-size: 23px; font-weight: 600; letter-spacing: -0.3px; }
+    .header p  { color: rgba(255,255,255,0.75); font-size: 13px; margin-top: 3px; }
+    .phase-badge {
+      display: inline-block; margin-top: 8px;
+      padding: 4px 16px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase;
+      background: rgba(255,255,255,0.2); color: #fff;
+    }
+
+    /* POMODORO DOTS */
+    .pomo-dots {
+      display: flex; justify-content: center; gap: 7px;
+      padding: 0.75rem 1.25rem 0;
+    }
+    .dot {
+      width: 11px; height: 11px; border-radius: 50%;
+      background: var(--border); transition: background 0.3s, transform 0.2s;
+    }
+    .dot.done   { background: var(--green); }
+    .dot.active { background: var(--blue); transform: scale(1.2); }
+
+    /* TIME PICKER */
+    .time-picker {
+      margin: 0.9rem 1.25rem 0;
+      background: var(--card); border-radius: var(--radius);
+      padding: 1rem 1.25rem; box-shadow: var(--shadow);
+    }
+    .picker-label { font-size: 12px; color: var(--text-2); margin-bottom: 10px; font-weight: 500; }
+    .time-inputs { display: flex; align-items: center; gap: 8px; justify-content: center; }
+    .time-unit { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .time-unit label { font-size: 11px; color: var(--text-3); font-weight: 500; }
+    .spin { display: flex; flex-direction: column; align-items: center; }
+    .spin-btn {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; width: 36px; height: 28px;
+      font-size: 15px; cursor: pointer; color: var(--text-2);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.1s, transform 0.1s; font-family: var(--font);
+    }
+    .spin-btn:hover { background: var(--border); }
+    .spin-btn:active { transform: scale(0.93); }
+    .spin-val {
+      font-family: var(--mono); font-size: 28px; font-weight: 500;
+      color: var(--text); min-width: 52px; text-align: center;
+      padding: 4px 0; line-height: 1.2;
+    }
+    .time-sep { font-size: 24px; font-weight: 600; color: var(--text-3); margin-top: -8px; }
+    .presets { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .preset {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px; font-size: 12px;
+      cursor: pointer; color: var(--text-2); font-family: var(--font);
+      transition: all 0.15s; font-weight: 500;
+    }
+    .preset:hover { border-color: var(--green); color: var(--green); }
+    .preset.on { background: var(--green); color: #fff; border-color: var(--green); }
+    .err { font-size: 12px; color: var(--red); text-align: center; margin-top: 6px; min-height: 16px; }
+
+    /* POMO INFO BAR */
+    .pomo-info {
+      margin: 0.75rem 1.25rem 0;
+      background: var(--card); border-radius: var(--radius-sm);
+      padding: 0.65rem 1rem; display: flex;
+      justify-content: space-between; box-shadow: var(--shadow);
+    }
+    .pomo-info span { display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 11px; color: var(--text-3); font-weight: 500; }
+    .pomo-info strong { font-size: 14px; font-weight: 600; color: var(--text); font-family: var(--mono); }
+
+    /* TIMER RING */
+    .ring-wrap {
+      display: flex; justify-content: center;
+      margin: 1rem 0 0; position: relative;
+    }
+    .ring-svg { transform: rotate(-90deg); }
+    .ring-bg   { fill: none; stroke: var(--border); stroke-width: 10; }
+    .ring-prog { fill: none; stroke: var(--green); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
+    .ring-center {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center; width: 160px;
+    }
+    .timer-num {
+      font-family: var(--mono); font-size: 36px; font-weight: 500;
+      color: var(--text); letter-spacing: 1px; white-space: nowrap;
+    }
+    .timer-lbl { font-size: 12px; color: var(--text-3); margin-top: 3px; font-weight: 500; }
+
+    /* BREAK CARD */
+    .break-card {
+      display: none; margin: 0.75rem 1.25rem 0;
+      background: var(--blue-light); border-radius: var(--radius);
+      padding: 0.85rem 1.25rem; text-align: center;
+    }
+    .break-card h3 { font-size: 15px; font-weight: 600; color: var(--blue); }
+    .break-card p  { font-size: 13px; color: var(--blue); opacity: 0.8; margin-top: 3px; }
+
+    /* SCORE CARD */
+    .score-card {
+      margin: 0.75rem 1.25rem 0;
+      background: var(--card); border-radius: var(--radius);
+      padding: 0.75rem 1.25rem; display: flex;
+      justify-content: space-between; align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .score-lbl  { font-size: 12px; color: var(--text-2); font-weight: 500; }
+    .score-num  { font-size: 28px; font-weight: 600; color: var(--green); font-family: var(--mono); }
+    .best-side  { text-align: right; }
+    .best-lbl   { font-size: 11px; color: var(--text-3); font-weight: 500; }
+    .best-num   { font-size: 16px; font-weight: 600; color: var(--text-2); font-family: var(--mono); }
+    .sesh-count { text-align: center; margin: 0.4rem 0 0; font-size: 12px; color: var(--text-3); }
+
+    /* BUTTONS */
+    .btn-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin: 0.9rem 1.25rem 0;
+    }
+    .btn {
+      border: none; border-radius: var(--radius-sm);
+      padding: 0.85rem 0.5rem; font-size: 14px;
+      font-weight: 600; cursor: pointer; font-family: var(--font);
+      transition: transform 0.1s, opacity 0.15s, box-shadow 0.15s;
+      box-shadow: var(--shadow);
+    }
+    .btn:active  { transform: scale(0.96); }
+    .btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-start   { background: var(--green); color: #fff; grid-column: 1 / -1; font-size: 16px; padding: 1rem; }
+    .btn-pause   { background: var(--blue); color: #fff; }
+    .btn-reset   { background: var(--card); color: var(--text-2); border: 1px solid var(--border); }
+    .btn-distract{ background: var(--red); color: #fff; grid-column: 1 / -1; }
+    .btn-skip    { background: var(--card); color: var(--text-2); border: 1px solid var(--border); grid-column: 1 / -1; font-size: 13px; display: none; }
+
+    .fb { text-align: center; font-size: 13px; color: var(--red); min-height: 20px; margin: 0.5rem 1.25rem 0; font-weight: 500; }
+
+    /* SESSION LIST */
+    .sesh-section { margin: 1rem 1.25rem 0; display: none; }
+    .sesh-hdr { font-size: 13px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; }
+    .sesh-item {
+      background: var(--card); border-radius: var(--radius-sm);
+      padding: 0.6rem 1rem; margin-bottom: 6px;
+      display: flex; justify-content: space-between;
+      align-items: center; font-size: 13px; box-shadow: var(--shadow);
+    }
+    .sesh-n { color: var(--text-3); font-weight: 500; }
+    .sesh-t { color: var(--text-2); }
+    .sesh-s { font-weight: 600; color: var(--green); font-family: var(--mono); }
+
+    /* RESULTS */
+    .results-body { padding: 1.25rem; }
+    .res-stat {
+      background: var(--card); border-radius: var(--radius);
+      padding: 0.9rem 1.25rem; margin-bottom: 10px;
+      display: flex; justify-content: space-between;
+      align-items: center; box-shadow: var(--shadow);
+    }
+    .res-lbl { font-size: 13px; color: var(--text-2); font-weight: 500; }
+    .res-val { font-size: 20px; font-weight: 600; color: var(--text); font-family: var(--mono); }
+    .perf {
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      margin: 1rem 0; text-align: center; font-size: 15px; font-weight: 600;
+    }
+    .perf.high { background: var(--green-light); color: #0f6e56; }
+    .perf.mid  { background: var(--blue-light);  color: #185fa5; }
+    .perf.low  { background: var(--red-light);   color: #a32d2d; }
+    .btn-new {
+      background: var(--green); color: #fff; border: none;
+      border-radius: var(--radius-sm); width: 100%; padding: 1rem;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      font-family: var(--font); margin-top: 0.5rem;
+      box-shadow: var(--shadow); transition: transform 0.1s;
+    }
+    .btn-new:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TIMER SCREEN -->
+  <div id="timerScreen" class="screen active">
+    <div class="header work" id="mainHeader">
+      <h1>FocusBoost</h1>
+      <p>Pomodoro technique — stay in the zone</p>
+      <div class="phase-badge" id="phaseBadge">Work Session</div>
+    </div>
+
+    <div class="pomo-dots" id="pomoDots"></div>
+
+    <div class="time-picker" id="timePicker">
+      <div class="picker-label">Set total focus duration (15 min – 10 hrs)</div>
+      <div class="time-inputs">
+        <div class="time-unit">
+          <div class="spin">
+            <button class="spin-btn" onclick="adjustTime('h',1)">▲</button>
+            <div class="spin-val" id="inpH">00</div>
+            <button class="spin-btn" onclick="adjustTime('h',-1)">▼</button>
+          </div>
+          <label>hours</label>
+        </div>
+        <div class="time-sep">:</div>
+        <div class="time-unit">
+          <div class="spin">
+            <button class="spin-btn" onclick="adjustTime('m',5)">▲</button>
+            <div class="spin-val" id="inpM">25</div>
+            <button class="spin-btn" onclick="adjustTime('m',-5)">▼</button>
+          </div>
+          <label>minutes</label>
+        </div>
+      </div>
+      <div class="err" id="errMsg"></div>
+      <div class="presets">
+        <button class="preset" onclick="setPreset(15,this)">15m</button>
+        <button class="preset on"  onclick="setPreset(25,this)">25m</button>
+        <button class="preset" onclick="setPreset(45,this)">45m</button>
+        <button class="preset" onclick="setPreset(60,this)">1h</button>
+        <button class="preset" onclick="setPreset(90,this)">1.5h</button>
+        <button class="preset" onclick="setPreset(120,this)">2h</button>
+      </div>
+    </div>
+
+    <div class="pomo-info">
+      <span><strong id="infoWork">25m</strong>work</span>
+      <span><strong id="infoShort">5m</strong>short break</span>
+      <span><strong id="infoLong">15m</strong>long break</span>
+      <span><strong id="infoSets">4</strong>pomodoros</span>
+    </div>
+
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="190" height="190" viewBox="0 0 190 190">
+        <circle class="ring-bg"   cx="95" cy="95" r="82"/>
+        <circle class="ring-prog" id="ring" cx="95" cy="95" r="82"
+                stroke-dasharray="515.2" stroke-dashoffset="0"/>
+      </svg>
+      <div class="ring-center">
+        <div class="timer-num" id="timerDisplay">25:00</div>
+        <div class="timer-lbl" id="timerStatus">Ready to study</div>
+      </div>
+    </div>
+
+    <div class="break-card" id="breakCard">
+      <h3 id="breakTitle">Short Break</h3>
+      <p id="breakSub">Stretch, breathe, rest your eyes</p>
+    </div>
+
+    <div class="score-card">
+      <div>
+        <div class="score-lbl">Focus Score</div>
+        <div class="score-num" id="scoreDisplay">0</div>
+      </div>
+      <div class="best-side">
+        <div class="best-lbl">Best today</div>
+        <div class="best-num" id="bestDisplay">—</div>
+      </div>
+    </div>
+    <div class="sesh-count" id="seshCount"></div>
+
+    <div class="btn-grid">
+      <button class="btn btn-start"    id="btnStart"    onclick="startTimer()">Start Study Session</button>
+      <button class="btn btn-pause"    id="btnPause"    onclick="pauseTimer()" disabled>Pause</button>
+      <button class="btn btn-reset"    id="btnReset"    onclick="resetAll()">Reset</button>
+      <button class="btn btn-distract" id="btnDistract" onclick="gotDistracted()" disabled>I Got Distracted</button>
+      <button class="btn btn-skip"     id="btnSkip"     onclick="skipPhase()">Skip to next phase ›</button>
+    </div>
+    <div class="fb" id="fb"></div>
+
+    <div class="sesh-section" id="seshSection">
+      <div class="sesh-hdr">Today's sessions</div>
+      <div id="seshList"></div>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen" class="screen">
+    <div class="header work">
+      <h1>All Done! 🎉</h1>
+      <p>Pomodoro session complete</p>
+      <div class="phase-badge">Results</div>
+    </div>
+    <div class="results-body">
+      <div class="res-stat">
+        <span class="res-lbl">Total focus time</span>
+        <span class="res-val" id="resTime">—</span>
+      </div>
+      <div class="res-stat">
+        <span class="res-lbl">Pomodoros completed</span>
+        <span class="res-val" id="resPomos">—</span>
+      </div>
+      <div class="res-stat">
+        <span class="res-lbl">Focus score</span>
+        <span class="res-val" id="resScore">0</span>
+      </div>
+      <div class="res-stat">
+        <span class="res-lbl">Best score today</span>
+        <span class="res-val" id="resBest">—</span>
+      </div>
+      <div class="perf" id="perfMsg"></div>
+      <button class="btn-new" onclick="newSession()">Start New Session</button>
+    </div>
+  </div>
+
+</div>
+<script>
+  const CIRC = 2 * Math.PI * 82;
+  const MIN_S = 15 * 60, MAX_S = 10 * 3600;
+
+  let pH = 0, pM = 25;
+  let goalSecs = 25 * 60;
+  let cfg, phase, phaseTime, phaseTotal;
+  let pomoDone, elapsedWork, score, bestScore, sessions;
+  let running, ticker, scoreTick, fbTimer;
+
+  function calcCfg(s) {
+    const m = s / 60;
+    let w, sb, lb;
+    if (m <= 30)       { w=15; sb=3;  lb=10; }
+    else if (m <= 60)  { w=25; sb=5;  lb=15; }
+    else if (m <= 120) { w=30; sb=5;  lb=15; }
+    else if (m <= 240) { w=45; sb=10; lb=20; }
+    else               { w=50; sb=10; lb=25; }
+    return { w: w*60, sb: sb*60, lb: lb*60, sets: 4 };
+  }
+
+  function init() {
+    cfg = calcCfg(goalSecs);
+    phase = 'work'; phaseTotal = cfg.w; phaseTime = cfg.w;
+    pomoDone = 0; elapsedWork = 0; score = 0; scoreTick = 0;
+    if (!bestScore) bestScore = null;
+    if (!sessions)  sessions  = [];
+    running = false;
+    updateInfoBar(); renderPicker(); buildDots(); updateUI();
+  }
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+
+  function fmtSecs(s) {
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    return h > 0
+      ? pad(h)+':'+pad(m)+':'+pad(sec)
+      : pad(m)+':'+pad(sec);
+  }
+
+  function fmtLabel(s) {
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60);
+    return h > 0 ? h+'h'+(m?'  '+m+'m':'') : m+'m';
+  }
+
+  function updateRing() {
+    const frac = phaseTime / phaseTotal;
+    document.getElementById('ring').style.strokeDashoffset = CIRC * (1 - frac);
+    document.getElementById('ring').style.stroke = phase === 'work' ? '#1d9e75' : '#185fa5';
+  }
+
+  function buildDots() {
+    const total = Math.max(1, Math.round(goalSecs / (cfg.w + cfg.sb)));
+    const show  = Math.min(total, 8);
+    let html = '';
+    for (let i = 0; i < show; i++) {
+      let c = 'dot';
+      if (i < pomoDone)                  c += ' done';
+      else if (i === pomoDone && phase === 'work') c += ' active';
+      html += `<div class="${c}"></div>`;
+    }
+    document.getElementById('pomoDots').innerHTML = html;
+  }
+
+  function updateInfoBar() {
+    document.getElementById('infoWork').textContent  = fmtLabel(cfg.w);
+    document.getElementById('infoShort').textContent = fmtLabel(cfg.sb);
+    document.getElementById('infoLong').textContent  = fmtLabel(cfg.lb);
+    document.getElementById('infoSets').textContent  = Math.max(1, Math.round(goalSecs / (cfg.w + cfg.sb)));
+  }
+
+  function updateHeader() {
+    const hdr   = document.getElementById('mainHeader');
+    const badge = document.getElementById('phaseBadge');
+    const bc    = document.getElementById('breakCard');
+    if (phase === 'work') {
+      hdr.className = 'header work';
+      badge.textContent = 'Work Session ' + (pomoDone + 1);
+      bc.style.display = 'none';
+      document.getElementById('btnDistract').disabled = !running;
+    } else {
+      hdr.className = 'header ' + (phase === 'short' ? 'short' : 'long');
+      badge.textContent = phase === 'short' ? 'Short Break' : 'Long Break';
+      bc.style.display = 'block';
+      document.getElementById('breakTitle').textContent = phase === 'short' ? 'Short Break ☕' : 'Long Break 🌿';
+      document.getElementById('breakSub').textContent   = phase === 'short' ? 'Stretch, breathe, rest your eyes' : 'Great work! Take a proper rest';
+      document.getElementById('btnDistract').disabled = true;
+    }
+  }
+
+  function updateUI() {
+    document.getElementById('timerDisplay').textContent = fmtSecs(phaseTime);
+    document.getElementById('scoreDisplay').textContent = score;
+    document.getElementById('bestDisplay').textContent  = bestScore !== null ? bestScore : '—';
+    updateRing(); buildDots();
+  }
+
+  function nextPhase() {
+    if (phase === 'work') {
+      pomoDone++;
+      elapsedWork += cfg.w;
+      playBeep(false);
+      if (elapsedWork >= goalSecs) { finishSession(); return; }
+      phase = (pomoDone % cfg.sets === 0) ? 'long' : 'short';
+      phaseTotal = (phase === 'long') ? cfg.lb : cfg.sb;
+    } else {
+      if (elapsedWork >= goalSecs) { finishSession(); return; }
+      phase = 'work'; phaseTotal = cfg.w;
+    }
+    phaseTime = phaseTotal; scoreTick = 0;
+    updateHeader(); updateUI();
+    document.getElementById('timerStatus').textContent = phase === 'work' ? 'Focus mode on' : 'Break time';
+    if (!running) {
+      document.getElementById('btnSkip').style.display = 'none';
+    }
+  }
+
+  function skipPhase() { nextPhase(); }
+
+  function startTimer() {
+    if (running) return;
+    const s = pH * 3600 + pM * 60;
+    if (s < MIN_S) { document.getElementById('errMsg').textContent = 'Minimum is 15 minutes.'; return; }
+    if (s > MAX_S) { document.getElementById('errMsg').textContent = 'Maximum is 10 hours.'; return; }
+    running = true;
+    document.getElementById('timerStatus').textContent = phase === 'work' ? 'Focus mode on' : 'Break time';
+    document.getElementById('btnStart').disabled    = true;
+    document.getElementById('btnPause').disabled    = false;
+    document.getElementById('btnSkip').style.display = 'none';
+    if (phase === 'work') document.getElementById('btnDistract').disabled = false;
+    document.getElementById('timePicker').style.opacity        = '0.45';
+    document.getElementById('timePicker').style.pointerEvents  = 'none';
+
+    ticker = setInterval(() => {
+      if (phaseTime <= 0) { nextPhase(); return; }
+      phaseTime--;
+      if (phase === 'work') { scoreTick++; if (scoreTick % 10 === 0) score++; }
+      updateUI();
+    }, 1000);
+  }
+
+  function pauseTimer() {
+    if (!running) return;
+    running = false; clearInterval(ticker);
+    document.getElementById('timerStatus').textContent     = 'Paused';
+    document.getElementById('btnStart').disabled           = false;
+    document.getElementById('btnStart').textContent        = 'Resume';
+    document.getElementById('btnPause').disabled           = true;
+    if (phase !== 'work') document.getElementById('btnSkip').style.display = 'block';
+  }
+
+  function resetAll() {
+    running = false; clearInterval(ticker);
+    document.getElementById('timePicker').style.opacity       = '1';
+    document.getElementById('timePicker').style.pointerEvents = 'auto';
+    document.getElementById('btnStart').disabled              = false;
+    document.getElementById('btnStart').textContent           = 'Start Study Session';
+    document.getElementById('btnPause').disabled              = true;
+    document.getElementById('btnDistract').disabled           = true;
+    document.getElementById('btnSkip').style.display          = 'none';
+    document.getElementById('timerStatus').textContent        = 'Ready to study';
+    document.getElementById('fb').textContent                 = '';
+    document.getElementById('breakCard').style.display        = 'none';
+    document.getElementById('mainHeader').className           = 'header work';
+    document.getElementById('phaseBadge').textContent         = 'Work Session';
+    cfg = calcCfg(goalSecs);
+    phase='work'; phaseTotal=cfg.w; phaseTime=cfg.w;
+    pomoDone=0; elapsedWork=0; score=0; scoreTick=0;
+    updateInfoBar(); updateUI();
+  }
+
+  function gotDistracted() {
+    if (!running || phase !== 'work') return;
+    score = Math.max(0, score - 5); updateUI();
+    clearTimeout(fbTimer);
+    document.getElementById('fb').textContent = '−5 points. You got this — refocus! 💪';
+    fbTimer = setTimeout(() => document.getElementById('fb').textContent = '', 2500);
+  }
+
+  function finishSession() {
+    running = false; clearInterval(ticker);
+    playBeep(true);
+    if (bestScore === null || score > bestScore) bestScore = score;
+    sessions.push({ score, time: fmtSecs(goalSecs), pomos: pomoDone });
+    document.getElementById('resTime').textContent  = fmtSecs(goalSecs);
+    document.getElementById('resPomos').textContent = pomoDone;
+    document.getElementById('resScore').textContent = score;
+    document.getElementById('resBest').textContent  = bestScore;
+    const maxScore = Math.floor(goalSecs / 10);
+    const pct = maxScore > 0 ? score / maxScore : 0;
+    const el = document.getElementById('perfMsg');
+    if (pct >= 0.75) { el.textContent = '🌟 Great focus! You absolutely crushed it!'; el.className = 'perf high'; }
+    else if (pct >= 0.4) { el.textContent = '👍 Good job! Keep improving each session.'; el.className = 'perf mid'; }
+    else { el.textContent = '💡 Try to reduce distractions next time!'; el.className = 'perf low'; }
+    document.getElementById('timerScreen').classList.remove('active');
+    document.getElementById('resultsScreen').classList.add('active');
+  }
+
+  function newSession() {
+    document.getElementById('resultsScreen').classList.remove('active');
+    document.getElementById('timerScreen').classList.add('active');
+    updateSeshList();
+    const c = sessions.length;
+    document.getElementById('seshCount').textContent = c > 0 ? c + ' session' + (c > 1 ? 's' : '') + ' completed today' : '';
+    resetAll();
+  }
+
+  function updateSeshList() {
+    if (!sessions.length) return;
+    document.getElementById('seshSection').style.display = 'block';
+    document.getElementById('seshList').innerHTML = sessions.slice().reverse().slice(0,5).map((s,i) => {
+      const n = sessions.length - i;
+      return `<div class="sesh-item">
+        <span class="sesh-n">Session ${n}</span>
+        <span class="sesh-t">${s.time} · ${s.pomos} pomos</span>
+        <span class="sesh-s">${s.score} pts</span>
+      </div>`;
+    }).join('');
+  }
+
+  function adjustTime(unit, delta) {
+    if (running) return;
+    if (unit === 'h') { pH = Math.max(0, Math.min(10, pH + delta)); if (pH === 10) pM = 0; }
+    else { if (pH === 10) return; pM = (pM + delta + 60) % 60; }
+    document.querySelectorAll('.preset').forEach(b => b.classList.remove('on'));
+    validateApply();
+  }
+
+  function setPreset(mins, btn) {
+    if (running) return;
+    pH = Math.floor(mins / 60); pM = mins % 60;
+    document.querySelectorAll('.preset').forEach(b => b.classList.remove('on'));
+    if (btn) btn.classList.add('on');
+    document.getElementById('errMsg').textContent = '';
+    applyPicker(); renderPicker();
+  }
+
+  function validateApply() {
+    const s = pH * 3600 + pM * 60;
+    const err = document.getElementById('errMsg');
+    if (s < MIN_S) { err.textContent = 'Minimum is 15 minutes.'; renderPicker(); return; }
+    if (s > MAX_S) { err.textContent = 'Maximum is 10 hours.';   renderPicker(); return; }
+    err.textContent = ''; applyPicker(); renderPicker();
+  }
+
+  function applyPicker() {
+    goalSecs = pH * 3600 + pM * 60;
+    cfg = calcCfg(goalSecs);
+    phase='work'; phaseTotal=cfg.w; phaseTime=cfg.w;
+    pomoDone=0; elapsedWork=0; score=0; scoreTick=0;
+    updateInfoBar(); updateUI();
+  }
+
+  function renderPicker() {
+    document.getElementById('inpH').textContent = pad(pH);
+    document.getElementById('inpM').textContent = pad(pM);
+  }
+
+  function playBeep(big) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const notes = big ? [523,659,784,1046] : [659,784];
+      notes.forEach((freq, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = freq; o.type = 'sine';
+        g.gain.setValueAtTime(0.35, ctx.currentTime + i * 0.17);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.17 + 0.4);
+        o.start(ctx.currentTime + i * 0.17);
+        o.stop(ctx.currentTime + i * 0.17 + 0.45);
+      });
+    } catch(e) {}
+  }
+
+  // Boot
+  init();
+</script>
+</body>
+</html>
