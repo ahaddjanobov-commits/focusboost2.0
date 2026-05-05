@@ -99,19 +99,20 @@
 
   <style>
     :root {
-      --bg:#0d1117; --bg2:#161b22; --bg3:#21262d; --border:#30363d;
-      --text:#e6edf3; --text2:#8b949e; --text3:#484f58;
-      --green:#39d353; --green2:#1d9e75; --blue:#58a6ff; --blue2:#1565a8;
-      --purple:#bc8cff; --orange:#f78166; --yellow:#e3b341; --red:#ff6b6b;
-      --grad1:linear-gradient(135deg,#1d9e75,#1565a8);
-      --grad2:linear-gradient(135deg,#bc8cff,#58a6ff);
-      --grad3:linear-gradient(135deg,#f78166,#e3b341);
-      --radius:16px; --shadow:0 8px 32px rgba(0,0,0,0.4);
+      --bg:#1a1118; --bg2:#251a22; --bg3:#332430; --border:#4a3244;
+      --text:#f5ede8; --text2:#c9a89c; --text3:#7a5a52;
+      --green:#4ade80; --green2:#22c55e; --blue:#60a5fa; --blue2:#3b82f6;
+      --purple:#c084fc; --orange:#fb923c; --yellow:#fbbf24; --red:#f87171;
+      --grad1:linear-gradient(135deg,#e85d75,#f97316);
+      --grad2:linear-gradient(135deg,#c084fc,#60a5fa);
+      --grad3:linear-gradient(135deg,#fb923c,#fbbf24);
+      --accent1:#e85d75; --accent2:#f97316; --accent3:#fbbf24;
+      --radius:16px; --shadow:0 8px 32px rgba(0,0,0,0.5);
       --font:'Nunito',sans-serif; --mono:'Space Mono',monospace;
     }
     .light-mode {
-      --bg:#f0f4f8; --bg2:#ffffff; --bg3:#e8ecf0; --border:#d0d7de;
-      --text:#1c2128; --text2:#57606a; --text3:#afb8c1;
+      --bg:#fff5f0; --bg2:#ffffff; --bg3:#ffe8e0; --border:#fcc9b8;
+      --text:#3d1a10; --text2:#8b4a35; --text3:#c4907a;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;overflow-x:hidden}
@@ -121,7 +122,7 @@
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-    @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(29,158,117,.3)}50%{box-shadow:0 0 40px rgba(29,158,117,.6)}}
+    @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(232,93,117,.4)}50%{box-shadow:0 0 40px rgba(232,93,117,.7)}}
     @keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
     @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
 
@@ -197,14 +198,14 @@
     #panel-timer{padding:1.25rem;max-width:480px;margin:0 auto;width:100%}
     .timer-header-card{border-radius:20px;padding:1.1rem 1.5rem;margin-bottom:.85rem;text-align:center;position:relative;overflow:hidden;transition:background .5s}
     .timer-header-card.work{background:var(--grad1)}
-    .timer-header-card.shortbreak{background:linear-gradient(135deg,#1565a8,#0e5e87)}
-    .timer-header-card.longbreak{background:linear-gradient(135deg,#0e5e87,#095070)}
+    .timer-header-card.shortbreak{background:linear-gradient(135deg,#7c3aed,#3b82f6)}
+    .timer-header-card.longbreak{background:linear-gradient(135deg,#0ea5e9,#6366f1)}
     .timer-header-card h2{color:#fff;font-size:17px;font-weight:900;position:relative}
-    .timer-header-card p{color:rgba(255,255,255,.8);font-size:12px;margin-top:2px;position:relative}
+    .timer-header-card p{color:rgba(255,255,255,.95);font-size:16px;font-weight:800;margin-top:4px;position:relative;letter-spacing:.2px}
     .phase-badge{display:inline-block;margin-top:5px;padding:3px 14px;border-radius:20px;font-size:11px;font-weight:800;background:rgba(255,255,255,.2);color:#fff;position:relative;letter-spacing:.5px}
     .pomo-dots{display:flex;gap:6px;justify-content:center;padding:.6rem 0 0;flex-wrap:wrap}
     .pomo-dot{width:11px;height:11px;border-radius:50%;background:var(--bg3);transition:all .3s}
-    .pomo-dot.done{background:var(--green2);box-shadow:0 0 8px rgba(29,158,117,.5)}
+    .pomo-dot.done{background:var(--accent1);box-shadow:0 0 8px rgba(232,93,117,.5)}
     .pomo-dot.active{background:var(--blue2);animation:pulse 1.5s infinite}
 
     .time-picker-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1.1rem;margin-top:.7rem;transition:opacity .3s}
@@ -230,7 +231,7 @@
     .ring-wrap{display:flex;justify-content:center;margin:.85rem 0 0;position:relative}
     .ring-svg{transform:rotate(-90deg)}
     .ring-bg{fill:none;stroke:var(--bg3);stroke-width:10}
-    .ring-prog{fill:none;stroke:var(--green2);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .5s}
+    .ring-prog{fill:none;stroke:var(--accent1);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .5s}
     .ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:160px}
     .timer-disp{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text);letter-spacing:2px;white-space:nowrap}
     .timer-status-txt{font-size:11px;color:var(--text2);margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
@@ -240,14 +241,25 @@
     .xp-bar-track{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden}
     .xp-bar-fill{height:100%;background:var(--grad2);border-radius:99px;transition:width 1s ease}
 
-    .break-card{background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.3);border-radius:var(--radius);padding:.8rem 1.1rem;text-align:center;display:none;margin-top:.7rem}
+    .break-card{background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);border-radius:var(--radius);padding:.8rem 1.1rem;text-align:center;display:none;margin-top:.7rem}
     .break-card-title{font-size:14px;font-weight:800;color:var(--blue)}
     .break-card-sub{font-size:12px;color:var(--blue);opacity:.8;margin-top:3px}
+
+    /* HOW TO USE */
+    .how-to-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-top:.7rem;overflow:hidden}
+    .how-to-toggle{width:100%;background:none;border:none;padding:.85rem 1.1rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:var(--font);font-size:14px;font-weight:800;color:var(--text);transition:background .2s}
+    .how-to-toggle:hover{background:var(--bg3)}
+    .how-to-body{display:none;padding:0 1.1rem 1rem;border-top:1px solid var(--border)}
+    .how-to-body.open{display:block}
+    .how-to-steps{display:flex;flex-direction:column;gap:10px;margin-top:.85rem}
+    .hts{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.5}
+    .hts strong{color:var(--text)}
+    .hts-num{min-width:24px;height:24px;border-radius:50%;background:var(--grad1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px}
 
     .score-row{display:flex;gap:8px;margin-top:.7rem}
     .stat-mini{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .85rem}
     .stat-mini-label{font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
-    .stat-mini-val{font-size:20px;font-weight:900;color:var(--green);margin-top:2px}
+    .stat-mini-val{font-size:20px;font-weight:900;color:var(--accent1);margin-top:2px}
     .stat-mini-val.blue{color:var(--blue)}
     .stat-mini-val.purple{color:var(--purple)}
 
@@ -272,7 +284,7 @@
     .stat-card-icon{font-size:22px;margin-bottom:5px}
     .stat-card-val{font-size:20px;font-weight:900}
     .stat-card-label{font-size:11px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
-    .stat-card.green .stat-card-val{color:var(--green)}
+    .stat-card.green .stat-card-val{color:var(--accent1)}
     .stat-card.blue .stat-card-val{color:var(--blue)}
     .stat-card.purple .stat-card-val{color:var(--purple)}
     .stat-card.orange .stat-card-val{color:var(--orange)}
@@ -299,7 +311,7 @@
     .session-item:last-child{border-bottom:none}
     .session-item-left h4{font-size:13px;font-weight:800}
     .session-item-left p{font-size:11px;color:var(--text2);margin-top:2px}
-    .session-score-badge{background:rgba(57,211,83,.15);color:var(--green);border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800}
+    .session-score-badge{background:rgba(232,93,117,.15);color:var(--accent1);border-radius:8px;padding:3px 10px;font-size:12px;font-weight:800}
 
     .achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:1.25rem}
     .ach-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem;text-align:center;transition:all .2s}
@@ -464,12 +476,30 @@
   <div id="panel-timer" class="tab-panel active">
     <div class="timer-header-card work" id="thc">
       <h2>FocusBoost</h2>
-      <p>Pomodoro technique — stay in the zone</p>
+      <p>Pomodoro Technique — Stay in the Zone</p>
       <span class="phase-badge" id="phase-badge">Work Session</span>
     </div>
     <div class="pomo-dots" id="pomo-dots"></div>
+
+    <!-- HOW TO USE -->
+    <div class="how-to-card">
+      <button class="how-to-toggle" onclick="toggleHowTo()">
+        <span>📖 How to use FocusBoost</span>
+        <span id="how-to-arrow">▼</span>
+      </button>
+      <div class="how-to-body" id="how-to-body">
+        <div class="how-to-steps">
+          <div class="hts"><span class="hts-num">1</span><div><strong>Set your time</strong> — pick any duration, from a quick sprint to a full day marathon. No minimum!</div></div>
+          <div class="hts"><span class="hts-num">2</span><div><strong>Hit Start</strong> — the Pomodoro timer automatically splits your session into focused work blocks and short breaks.</div></div>
+          <div class="hts"><span class="hts-num">3</span><div><strong>Stay focused</strong> — earn +1 Focus Score every 10 seconds you stay on task.</div></div>
+          <div class="hts"><span class="hts-num">4</span><div><strong>Got distracted?</strong> — tap the button to log it. Honesty helps you improve. It costs -5 points.</div></div>
+          <div class="hts"><span class="hts-num">5</span><div><strong>Take your breaks</strong> — short breaks every 25 min, long break every 4 sessions. Your brain needs it!</div></div>
+          <div class="hts"><span class="hts-num">6</span><div><strong>Track progress</strong> — check the Dashboard to see your streaks, XP, level, and session history.</div></div>
+        </div>
+      </div>
+    </div>
     <div class="time-picker-card" id="tpc">
-      <div class="tpc-label">Set total focus duration (15 min – 10 hrs)</div>
+      <div class="tpc-label">Set your focus duration</div>
       <div class="time-inputs">
         <div class="time-unit">
           <button class="spin-btn" onclick="adjTime('h',1)">▲</button>
@@ -633,8 +663,8 @@
 // CONSTANTS
 // ═══════════════════════════════════
 const CIRC   = 2*Math.PI*82;
-const MIN_S  = 15*60;
-const MAX_S  = 10*3600;
+const MIN_S  = 0;
+const MAX_S  = 99*3600;
 const ADMIN_CODE = 'focusboost2024';
 
 const LEVELS = [
@@ -1000,7 +1030,7 @@ function updateRing(){
   const offset=CIRC*(1-phaseT/phaseTot);
   const r=document.getElementById('ring');
   r.style.strokeDashoffset=offset;
-  r.style.stroke=phase==='work'?'var(--green2)':'var(--blue2)';
+  r.style.stroke=phase==='work'?'var(--accent1)':'var(--blue2)';
 }
 
 function buildDots(){
@@ -1064,8 +1094,7 @@ window.skipPhase=skipPhase;
 
 function startTimer(){
   const s=pickerS();
-  if(s<MIN_S){document.getElementById('err-msg').textContent='Minimum is 15 minutes.';return;}
-  if(s>MAX_S){document.getElementById('err-msg').textContent='Maximum is 10 hours.';return;}
+  if(s>MAX_S){document.getElementById('err-msg').textContent='Maximum is 99 hours.';return;}
   if(running)return;
   running=true;
   document.getElementById('timer-status').textContent='Focus mode on 🎯';
@@ -1148,8 +1177,8 @@ async function endSession(){
 // ═══════════════════════════════════
 function adjTime(unit,delta){
   if(running)return;
-  if(unit==='h'){pH=Math.max(0,Math.min(10,pH+delta));if(pH===10)pM=0;}
-  else{if(pH===10)return;pM=(pM+delta+60)%60;}
+  if(unit==='h'){pH=Math.max(0,Math.min(99,pH+delta));}
+  else{pM=(pM+delta+60)%60;}
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
   valAndApply();
 }
@@ -1167,8 +1196,7 @@ window.setPreset=setPreset;
 
 function valAndApply(){
   const s=pickerS();const err=document.getElementById('err-msg');
-  if(s<MIN_S){err.textContent='Minimum is 15 minutes.';renderPicker();return;}
-  if(s>MAX_S){err.textContent='Maximum is 10 hours.';renderPicker();return;}
+  if(s>MAX_S){err.textContent='Maximum is 99 hours.';renderPicker();return;}
   err.textContent='';applyPicker();renderPicker();
 }
 
@@ -1192,6 +1220,17 @@ function playBeep(big){
     });
   }catch(e){}
 }
+
+// ═══════════════════════════════════
+// HOW TO USE TOGGLE
+// ═══════════════════════════════════
+function toggleHowTo(){
+  const body=document.getElementById('how-to-body');
+  const arrow=document.getElementById('how-to-arrow');
+  body.classList.toggle('open');
+  arrow.textContent=body.classList.contains('open')?'▲':'▼';
+}
+window.toggleHowTo=toggleHowTo;
 
 // ═══════════════════════════════════
 // INIT
